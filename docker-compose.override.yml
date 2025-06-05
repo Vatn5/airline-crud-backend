@@ -1,0 +1,5 @@
+services:
+  api:
+    volumes:
+      - ./api:/usr/src/app
+    command: npm run dev
