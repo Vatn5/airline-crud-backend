@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import flightsRouter from "./routes/flights";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,6 +30,7 @@ const connectWithRetry = () => {
 connectWithRetry();
 
 app.use(express.json());
+app.use("/flights", flightsRouter);
 
 // (Opcional: tus rutas aquí)
 app.get("/", (req, res) => {
