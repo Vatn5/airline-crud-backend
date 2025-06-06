@@ -1,0 +1,13 @@
+GET http://localhost:3000/api/flights
+
+GET http://localhost:3000/api/flights?page=2&limit=10
+
+GET http://localhost:3000/api/flights?flightCode=AB123
+
+GET http://localhost:3000/api/flights?sort=flightCode
+
+GET http://localhost:3000/api/flights?sort=-flightCode
+
+GET http://localhost:3000/api/flights?sort=-flightCode&page=3&limit=5
+
+GET http://localhost:3000/api/flights?flightCode=AB123&sort=-flightCode&page=1&limit=2

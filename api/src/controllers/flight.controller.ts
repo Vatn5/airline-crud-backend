@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Flight from "../models/Flight";
 import { FlightZodSchema } from "../validation/flight.schema";
+import { ALLOWED_SORT_FIELDS } from "../constants/sortFields";
 
 // Seguridad extra: Sanea strings y evita inyección de objetos
 const sanitizeInput = (data: any) => JSON.parse(JSON.stringify(data));
@@ -38,32 +39,48 @@ export async function createFlight(req: Request, res: Response): Promise<void> {
 }
 
 export async function getFlights(req: Request, res: Response): Promise<void> {
-try {
-  // Soporta paginación: ?page=1&limit=20
-  const page = Math.max(1, parseInt(req.query['page'] as string) || 1);
-  const limit = Math.max(1, parseInt(req.query['limit'] as string) || 20);
+  try {
+    // Soporta paginación: ?page=1&limit=20
+    const page = Math.max(1, parseInt(req.query['page'] as string) || 1);
+    const limit = Math.max(1, parseInt(req.query['limit'] as string) || 20);
 
-  const filter: any = {};
-  if (req.query['flightCode']) filter.flightCode = req.query['flightCode'];
+    const filter: any = {};
+    if (req.query['flightCode']) filter.flightCode = req.query['flightCode'];
 
-  const flights = await Flight.find(filter)
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .lean();
+    // VALIDACIÓN Y USO DE SORT
+    let sort: any = {};
+    if (req.query['sort']) {
+      const sortFieldRaw = req.query['sort'] as string;
+      const desc = sortFieldRaw.startsWith("-");
+      const sortField = desc ? sortFieldRaw.slice(1) : sortFieldRaw;
 
-  const total = await Flight.countDocuments(filter);
+      if (ALLOWED_SORT_FIELDS.includes(sortField)) {
+        sort[sortField] = desc ? -1 : 1;
+      } else {
+        res.status(400).json({ error: `Campo de ordenamiento no permitido: ${sortField}` });
+        return;
+      }
+    }
 
-  res.status(200).json({
-    flights,
-    page,
-    limit,
-    total,
-    totalPages: Math.ceil(total / limit)
-  });
-  return;
-} catch (error) {
-  res.status(500).json({ error: "Error interno del servidor" });
-  return;
+    const flights = await Flight.find(filter)
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    const total = await Flight.countDocuments(filter);
+
+    res.status(200).json({
+      flights,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
+    });
+    return;
+  } catch (error) {
+    res.status(500).json({ error: "Error interno del servidor" });
+    return;
   }
 }
 
