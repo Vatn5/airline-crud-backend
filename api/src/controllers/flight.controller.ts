@@ -35,3 +35,15 @@ export async function createFlight(req: Request, res: Response): Promise<void> {
     return;
   }
 }
+
+export async function getFlights(req: Request, res: Response): Promise<void> {
+  try {
+    // Puedes agregar filtros, paginación, etc.
+    const flights = await Flight.find().lean();
+    res.status(200).json({ flights });
+    return;
+  } catch (error) {
+    res.status(500).json({ error: "Error interno del servidor" });
+    return;
+  }
+}
