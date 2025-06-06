@@ -5,11 +5,16 @@ FROM node:22-alpine AS build
 
 WORKDIR /usr/src/app
 
+COPY .env .env
+
+
 COPY package*.json ./
 RUN npm install
 
 COPY . .
 RUN npm run build
+
+
 
 # 2. Etapa de producción (solo el código compilado y dependencias necesarias)
 FROM node:22-alpine AS production

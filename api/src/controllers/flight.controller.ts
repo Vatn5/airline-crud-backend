@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import Flight from "../models/Flight.js";
-import { FlightZodSchema } from "../validation/flight.schema.js";
+import mongoose from "mongoose";
+import Flight from "../models/Flight";
+import { FlightZodSchema } from "../validation/flight.schema";
 
 // Seguridad extra: Sanea strings y evita inyección de objetos
 const sanitizeInput = (data: any) => JSON.parse(JSON.stringify(data));
@@ -45,5 +46,26 @@ export async function getFlights(req: Request, res: Response): Promise<void> {
   } catch (error) {
     res.status(500).json({ error: "Error interno del servidor" });
     return;
+  }
+}
+
+export const getFlightById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    // Validar el formato antes de buscar
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({ error: "ID inválido" });
+      return;
+    }
+    const flight = await Flight.findById(id);
+    if (!flight) {
+      res.status(404).json({ error: "Vuelo no encontrado" });
+      return;
+    }
+    res.json(flight);
+    return;
+  } catch (error) {
+    res.status(500).json({ error: "Error del servidor" });
+    return; 
   }
 }

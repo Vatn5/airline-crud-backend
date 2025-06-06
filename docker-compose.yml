@@ -24,7 +24,7 @@ services:
     ports:
       - "${PORT}:${PORT}"
     volumes:
-      - ./api:/usr/src/app
+       - ./api/.env:/usr/src/app/.env 
     depends_on:
       - mongo
 

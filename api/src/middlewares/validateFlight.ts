@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { FlightZodSchema } from "../validation/flight.schema.js";
+import { FlightZodSchema } from "../validation/flight.schema";
 
 // Valida y corta la cadena si los datos son incorrectos
 export function validateFlight(req: Request, res: Response, next: NextFunction): void {

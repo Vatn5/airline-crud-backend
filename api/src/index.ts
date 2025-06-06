@@ -1,6 +1,7 @@
-import "dotenv/config";
+import "dotenv/config"; // Carga las variables de entorno desde .env
 import mongoose from "mongoose";
-import app from "./app.js"; // Recuerda la extensión .js si usas NodeNext/ESM
+import app from "./app"; 
+
 
 const port = process.env['PORT'] || 3000;
 const mongoUri = process.env['MONGO_URI'];
