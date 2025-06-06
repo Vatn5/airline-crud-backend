@@ -38,14 +38,32 @@ export async function createFlight(req: Request, res: Response): Promise<void> {
 }
 
 export async function getFlights(req: Request, res: Response): Promise<void> {
-  try {
-    // Puedes agregar filtros, paginación, etc.
-    const flights = await Flight.find().lean();
-    res.status(200).json({ flights });
-    return;
-  } catch (error) {
-    res.status(500).json({ error: "Error interno del servidor" });
-    return;
+try {
+  // Soporta paginación: ?page=1&limit=20
+  const page = Math.max(1, parseInt(req.query['page'] as string) || 1);
+  const limit = Math.max(1, parseInt(req.query['limit'] as string) || 20);
+
+  const filter: any = {};
+  if (req.query['flightCode']) filter.flightCode = req.query['flightCode'];
+
+  const flights = await Flight.find(filter)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean();
+
+  const total = await Flight.countDocuments(filter);
+
+  res.status(200).json({
+    flights,
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit)
+  });
+  return;
+} catch (error) {
+  res.status(500).json({ error: "Error interno del servidor" });
+  return;
   }
 }
 
