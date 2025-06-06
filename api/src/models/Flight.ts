@@ -13,6 +13,7 @@ export interface Passenger {
 
 export interface FlightDocument extends Document {
   flightCode: string;
+  capacity: number;
   passengers: Passenger[];
 }
 
@@ -33,6 +34,7 @@ const PassengerSchema = new Schema<Passenger>(
 // Modelo principal Flight
 const FlightSchema = new Schema<FlightDocument>({
   flightCode: { type: String, required: true },
+  capacity: { type: Number, required: true },
   passengers: { type: [PassengerSchema], required: true }
 });
 
