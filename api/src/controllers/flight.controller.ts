@@ -69,3 +69,58 @@ export const getFlightById = async (req: Request, res: Response): Promise<void> 
     return; 
   }
 }
+
+export const updateFlight = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    // Valida el ID como antes
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({ error: "ID inválido" });
+      return;
+    }
+    const flight = await Flight.findByIdAndUpdate(id, req.body, { new: true, overwrite: true, runValidators: true });
+    if (!flight) {
+      res.status(404).json({ error: "Vuelo no encontrado" });
+      return;
+    }
+    res.json(flight);
+  } catch (error) {
+    res.status(500).json({ error: "Error al actualizar el vuelo" });
+  }
+};
+
+export const patchFlight = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({ error: "ID inválido" });
+      return;
+    }
+    const flight = await Flight.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+    if (!flight) {
+      res.status(404).json({ error: "Vuelo no encontrado" });
+      return;
+    }
+    res.json(flight);
+  } catch (error) {
+    res.status(500).json({ error: "Error al actualizar el vuelo" });
+  }
+};
+
+export const deleteFlight = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({ error: "ID inválido" });
+      return;
+    }
+    const flight = await Flight.findByIdAndDelete(id);
+    if (!flight) {
+      res.status(404).json({ error: "Vuelo no encontrado" });
+      return;
+    }
+    res.json({ message: "Vuelo eliminado exitosamente" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al eliminar el vuelo" });
+  }
+};
